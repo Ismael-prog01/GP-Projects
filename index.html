@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Gestión de Proyectos de Arquitectura</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Inter para estética moderna -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .grid-container {
+            display: grid;
+            gap: 1rem;
+            grid-template-areas: "header" "proyectos" "bitacora";
+            padding: 1rem;
+        }
+        @media (min-width: 1024px) {
+            .grid-container {
+                grid-template-columns: 2fr 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas: "header header" "proyectos bitacora";
+                height: calc(100vh - 4rem); /* Altura de pantalla menos header */
+            }
+            .proyectos-area { grid-area: proyectos; overflow-y: auto; }
+            .bitacora-area { grid-area: bitacora; overflow-y: auto; }
+        }
+        .card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navbar/Header Fijo -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <h1 class="text-2xl font-bold text-indigo-700">ArquiPro Manager</h1>
+            <div id="user-info" class="text-sm text-gray-600 flex items-center">
+                <!-- Ícono de usuario de Lucide -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-indigo-500"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span id="display-user-id">Cargando usuario...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor principal de la aplicación -->
+    <main class="grid-container max-w-7xl mx-auto">
+
+        <!-- Área de Gestión de Proyectos y Tareas (Columna Izquierda o Superior) -->
+        <section class="proyectos-area bg-white p-6 card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex justify-between items-center">
+                Gestión de Proyectos: Avance "Edificio Central"
+                <button onclick="showMessage('Funcionalidad: Abrir cronograma interactivo (Gantt)')" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-1.5 px-3 rounded-full transition duration-150">
+                    Ver Cronograma Completo
+                </button>
+            </h2>
+
+            <!-- Simulación de Tareas (Ejemplo de Módulo 1) -->
+            <div id="project-tasks" class="space-y-3">
+                <div class="p-4 border-l-4 border-indigo-500 bg-gray-50 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="font-medium text-gray-700">Fase 4: Estructura de Muros</p>
+                        <p class="text-sm text-gray-500">Responsable: Ing. Carlos | Vence: 15 Oct</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                         <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded text-yellow-600 bg-yellow-200">
+                            Pendiente
+                        </span>
+                        <input type="checkbox" onchange="toggleTaskCompletion(this)" class="form-checkbox h-5 w-5 text-indigo-600 rounded">
+                    </div>
+                </div>
+                <div class="p-4 border-l-4 border-green-500 bg-gray-50 rounded-lg flex justify-between items-center opacity-70">
+                    <div>
+                        <p class="font-medium text-gray-700 line-through">Fase 3: Instalación Eléctrica</p>
+                        <p class="text-sm text-gray-500">Responsable: Téc. Luisa | Finalizada: 01 Oct</p>
+                    </div>
+                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded text-green-600 bg-green-200">
+                        Completada
+                    </span>
+                </div>
+                <!-- Aquí se cargarían más tareas desde Firestore -->
+            </div>
+
+            <div class="mt-6 border-t pt-4">
+                <h3 class="font-semibold text-lg mb-3 text-gray-700">Control de Presupuesto (Simulación)</h3>
+                <div class="flex flex-wrap gap-4">
+                    <div class="bg-blue-50 p-3 rounded-lg flex-1 min-w-[150px]">
+                        <p class="text-sm text-blue-600">Presupuesto Asignado</p>
+                        <p class="text-lg font-bold text-blue-800">$ 450,000.00</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg flex-1 min-w-[150px]">
+                        <p class="text-sm text-red-600">Gasto Acumulado</p>
+                        <p class="text-lg font-bold text-red-800">$ 385,200.00</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded-lg flex-1 min-w-[150px]">
+                        <p class="text-sm text-yellow-600">Desviación (15%)</p>
+                        <p class="text-lg font-bold text-yellow-800">$ 5,200.00</p>
+                    </div>
+                </div>
+                <button onclick="showMessage('Funcionalidad: Generar reporte de costos y materiales')" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 rounded-lg transition duration-150">
+                    Generar Reporte de Costos
+                </button>
+            </div>
+        </section>
+
+        <!-- Área de Bitácora Diaria (Columna Derecha o Inferior) -->
+        <section class="bitacora-area bg-white p-6 card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Bitácora Diaria de Obra</h2>
+
+            <!-- Formulario de Nueva Bitácora (Mobile-first, se verá bien en el celular) -->
+            <form id="bitacora-form" class="space-y-4 mb-6 p-4 bg-indigo-50 rounded-lg">
+                <h3 class="font-semibold text-lg text-indigo-700">Nuevo Registro (Hoy)</h3>
+
+                <div>
+                    <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción de Actividades:</label>
+                    <textarea id="descripcion" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"></textarea>
+                </div>
+                <div>
+                    <label for="materiales" class="block text-sm font-medium text-gray-700">Materiales Usados / Incidencias:</label>
+                    <input type="text" id="materiales" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2">
+                </div>
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <label for="personal" class="block text-sm font-medium text-gray-700">Personal en Sitio:</label>
+                        <input type="number" id="personal" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2">
+                    </div>
+                    <div class="flex-1">
+                        <label for="clima" class="block text-sm font-medium text-gray-700">Clima:</label>
+                        <select id="clima" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2">
+                            <option>Soleado</option>
+                            <option>Nublado</option>
+                            <option>Lluvioso</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Funcionalidad simulada para adjuntar fotos (crucial para mobile) -->
+                <button type="button" onclick="showMessage('Funcionalidad: Abrir cámara o galería para subir fotos de la obra')" class="w-full py-2 bg-indigo-200 text-indigo-800 font-medium rounded-lg hover:bg-indigo-300 transition duration-150 flex items-center justify-center">
+                    <!-- Ícono de cámara de Lucide -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                    Adjuntar Foto del Avance
+                </button>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+                    Guardar Bitácora
+                </button>
+            </form>
+
+            <!-- Lista de Bitácoras (Sección de Reportes) -->
+            <h3 class="font-semibold text-lg text-gray-700 mt-6 mb-3 border-t pt-4">Historial de Bitácoras</h3>
+            <div id="bitacora-list" class="space-y-4">
+                <!-- Bitácora de ejemplo (se cargaría aquí desde Firestore) -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg">
+                    <p class="text-sm text-gray-500">24 Octubre 2025, 10:30 AM</p>
+                    <p class="font-medium text-gray-700 mt-1">Se completó la Fase de cimentación y se inició la instalación de tubería principal. 8 obreros en sitio. Clima: Soleado.</p>
+                    <button onclick="showMessage('Funcionalidad: Exportar el reporte de avance a PDF o Excel')" class="mt-2 text-indigo-500 text-xs font-medium hover:text-indigo-700">Exportar Reporte</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal/Message Box (Reemplaza alert()) -->
+    <div id="message-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full card">
+            <h3 class="text-lg font-semibold text-indigo-700 mb-3">Notificación</h3>
+            <p id="message-content" class="text-gray-600 mb-4"></p>
+            <button onclick="closeMessage()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-md font-medium">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Script de Firebase (Importaciones) y Lógica de la App -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Establecer el nivel de registro para Firebase (útil para depuración)
+        setLogLevel('Debug');
+
+        // =========================================================================
+        // === PASO CLAVE: CONFIGURACIÓN DE FIREBASE PARA USO REAL (NO CANVAS) ===
+        // -------------------------------------------------------------------------
+        /*
+        * INSTRUCCIONES:
+        * Este es el código COMPLETO y configurado con tus credenciales.
+        * 1. Si estás usando este archivo en el entorno de CANVAS, funcionará usando las variables de entorno.
+        * 2. Si estás copiando este código a tu archivo index.html en PyCharm, estas credenciales (firebaseConfig) son las que se usarán para conectar con tu base de datos 'gp-projects'.
+        */
+
+        // --- CONFIGURACIÓN CON CREDENCIALES REALES DEL USUARIO (Proyecto: gp-projects) ---
+        const appId = "gp-projects"; // Usamos el projectId para la ruta de la base de datos
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrZHbSj3V5IiFJkuoI65FpcXE2YScSbRc",
+            authDomain: "gp-projects.firebaseapp.com",
+            projectId: "gp-projects",
+            storageBucket: "gp-projects.firebasestorage.app",
+            messagingSenderId: "1020529511135",
+            appId: "1:1020529511135:web:a9e97ffab2a00fa071776a",
+            measurementId: "G-PCR78JV3DC"
+        };
+        // Mantenemos la lógica de token inicial para la autenticación en el entorno de Canvas o local.
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // -----------------------------------------------------------------
+
+        let app, db, auth;
+        let userId = 'anonimo'; // Valor predeterminado
+
+        /**
+         * 1. Inicializa Firebase y autentica al usuario.
+         */
+        async function initFirebase() {
+            if (!firebaseConfig.apiKey) {
+                console.error("Error: firebaseConfig no está disponible. El almacenamiento en la nube no funcionará.");
+                document.getElementById('display-user-id').textContent = 'Error: Sin Configuración de DB';
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Autenticación usando el token o de forma anónima
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Esperar el cambio de estado de autenticación
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('display-user-id').textContent = ID Usuario: ${userId.substring(0, 8)}... (Completo: ${userId});
+                        // Iniciar la escucha de datos después de la autenticación
+                        setupFirestoreListeners();
+                    } else {
+                        userId = 'anonimo-' + crypto.randomUUID();
+                        document.getElementById('display-user-id').textContent = Usuario anónimo (ID: ${userId.substring(0, 8)}...);
+                    }
+                    console.log(Firebase inicializado. ID de usuario: ${userId});
+                });
+
+            } catch (error) {
+                console.error("Error al inicializar Firebase o al autenticar:", error);
+                showMessage(Error de conexión: ${error.message});
+            }
+        }
+
+        /**
+         * 2. Define las rutas y colecciones de Firestore.
+         * Usamos una colección "public" para que todos los usuarios vean los proyectos.
+         */
+        function getBitacoraCollectionRef() {
+            // Ruta para datos públicos del proyecto (accesible por todos los usuarios del app)
+            return collection(db, artifacts/${appId}/public/data/bitacoras);
+        }
+
+
+        /**
+         * 3. Lógica para manejar el formulario de Bitácora.
+         */
+        document.getElementById('bitacora-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!db) {
+                showMessage("Base de datos no disponible. Por favor, recarga la página.");
+                return;
+            }
+
+            const data = {
+                descripcion: document.getElementById('descripcion').value,
+                materiales: document.getElementById('materiales').value,
+                personal: parseInt(document.getElementById('personal').value, 10),
+                clima: document.getElementById('clima').value,
+                // Metadatos cruciales
+                timestamp: serverTimestamp(),
+                userId: userId,
+                proyecto: "Edificio Central" // Se podría seleccionar de un dropdown
+            };
+
+            try {
+                // Guardar el documento en Firestore
+                await addDoc(getBitacoraCollectionRef(), data);
+                showMessage("Bitácora guardada con éxito. Sincronizando en tiempo real.");
+                this.reset(); // Limpiar el formulario
+            } catch (error) {
+                console.error("Error al guardar la bitácora:", error);
+                showMessage(Error al guardar: ${error.message});
+            }
+        });
+
+        /**
+         * 4. Escucha en tiempo real de Firestore (onSnapshot).
+         */
+        function setupFirestoreListeners() {
+            if (!db) return;
+
+            // Consultar las bitácoras (ordenar por fecha de creación, pero esto lo haremos en JS)
+            const q = query(getBitacoraCollectionRef());
+
+            // onSnapshot mantendrá la lista sincronizada en tiempo real
+            onSnapshot(q, (snapshot) => {
+                const bitacoras = [];
+                snapshot.forEach((doc) => {
+                    bitacoras.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Ordenar en el cliente para evitar problemas de índice con orderBy
+                bitacoras.sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds);
+
+                renderBitacoras(bitacoras);
+            }, (error) => {
+                console.error("Error al escuchar bitácoras:", error);
+                showMessage(Error de sincronización en tiempo real: ${error.message});
+            });
+        }
+
+        /**
+         * 5. Renderiza la lista de bitácoras en el HTML.
+         */
+        function renderBitacoras(bitacoras) {
+            const listContainer = document.getElementById('bitacora-list');
+            listContainer.innerHTML = ''; // Limpiar la lista
+
+            if (bitacoras.length === 0) {
+                listContainer.innerHTML = '<p class="text-gray-500 italic">Aún no hay registros de bitácora.</p>';
+                return;
+            }
+
+            bitacoras.forEach(bitacora => {
+                const date = bitacora.timestamp ? new Date(bitacora.timestamp.seconds * 1000).toLocaleString('es-ES') : 'Fecha desconocida';
+                const bitacoraElement = document.createElement('div');
+                bitacoraElement.className = 'p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition duration-150';
+                bitacoraElement.innerHTML = `
+                    <p class="text-xs text-indigo-500 font-medium">${date} | Usuario: ${bitacora.userId.substring(0, 8)}...</p>
+                    <p class="font-semibold text-gray-800 mt-1">${bitacora.descripcion}</p>
+                    <p class="text-sm text-gray-600">Materiales/Incidencias: ${bitacora.materiales}</p>
+                    <p class="text-sm text-gray-600">Personal: ${bitacora.personal} | Clima: ${bitacora.clima}</p>
+                    <button onclick="showMessage('Funcionalidad: Exportar la bitácora ${bitacora.id} a PDF')" class="mt-2 text-red-500 text-xs font-medium hover:text-red-700">Eliminar (Simulado)</button>
+                `;
+                listContainer.appendChild(bitacoraElement);
+            });
+        }
+
+        // --- Funcionalidades y Utilidades de la Interfaz ---
+
+        function showMessage(message) {
+            document.getElementById('message-content').textContent = message;
+            document.getElementById('message-modal').classList.remove('hidden');
+        }
+
+        window.closeMessage = function() {
+            document.getElementById('message-modal').classList.add('hidden');
+        }
+
+        window.toggleTaskCompletion = function(checkbox) {
+            const taskDiv = checkbox.closest('div');
+            // Simulamos una actualización visual
+            if (checkbox.checked) {
+                taskDiv.classList.remove('border-indigo-500');
+                taskDiv.classList.add('border-green-500', 'opacity-70');
+                taskDiv.querySelector('p:first-child').classList.add('line-through');
+                showMessage('Tarea completada (Simulación). El cambio se enviaría a Firestore.');
+            } else {
+                taskDiv.classList.remove('border-green-500', 'opacity-70');
+                taskDiv.classList.add('border-indigo-500');
+                taskDiv.querySelector('p:first-child').classList.remove('line-through');
+                showMessage('Tarea reactivada (Simulación). El cambio se enviaría a Firestore.');
+            }
+        }
+
+        // Inicializar la aplicación al cargar la página
+        window.onload = initFirebase;
+    </script>
+</body>
+</html>
